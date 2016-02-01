@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="author" content="Roman Kierzkowski" />
+
+
+<title>Impact of Transmission on MPG</title>
+
+<script src="project_files/jquery-1.11.0/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="project_files/bootstrap-3.3.1/css/journal.min.css" rel="stylesheet" />
+<script src="project_files/bootstrap-3.3.1/js/bootstrap.min.js"></script>
+<script src="project_files/bootstrap-3.3.1/shim/html5shiv.min.js"></script>
+<script src="project_files/bootstrap-3.3.1/shim/respond.min.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<link rel="stylesheet"
+      href="project_files/highlight/default.css"
+      type="text/css" />
+<script src="project_files/highlight/highlight.js"></script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img { 
+  max-width:100%; 
+  height: auto; 
+}
+</style>
+<div class="container-fluid main-container">
+
+
+<div id="header">
+<h1 class="title">Impact of Transmission on MPG</h1>
+<h4 class="author"><em>Roman Kierzkowski</em></h4>
+</div>
+
+
+<div id="executive-summary" class="section level2">
+<h2>Executive Summary</h2>
+<p>It is not possible to quantify the MPG difference between automatic and manual transmissions in a given data set. There is no evidence in data to substantiate the claim that any kind of transmission is better for MPG. The superficial relation between MPG and transmission type can be entirely explained by the weight of an engine.</p>
+<p>However there is a correlation between weight of an engine and a transmission type. Probably, the engines with automatic transmission are heavier (or maybe data set is skewed).</p>
+</div>
+<div id="data-exploration" class="section level2">
+<h2>Data Exploration</h2>
+<p>At a first glance on a data we can see that the average MPG for the automatic transmission (black) is lower than form manual transmission (red). Is that enough to draw a conclusion? No. Let’s take a look on other columns.</p>
+<p><img src="project_files/figure-html/unnamed-chunk-1-1.png" title="" alt="" width="672" /></p>
+<p>We can see that there is high correlation between MPG and other columns - weight, number of cylinders, displacement etc. So, the correlation between the transmission mode can be explained by other data.</p>
+<p><img src="project_files/figure-html/unnamed-chunk-2-1.png" title="" alt="" width="672" /></p>
+<p>Further more there is correlation between weight and type of transmission. The heavier engines in data set have also automatic transmission. Maybe there is casual relation or maybe the data set is skewed? It is hard to determine.</p>
+<p><img src="project_files/figure-html/unnamed-chunk-3-1.png" title="" alt="" width="672" /></p>
+</div>
+<div id="model-selection." class="section level2">
+<h2>Model selection.</h2>
+<p>First, I tried to use all available fields to explain MPG. The results are explained in Appendix 1. The most significant results were for weight. Still, the p value was above 0.05. I decided to try the model solely based on this param.</p>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt, data = mtcars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.5432 -2.3647 -0.1252  1.4096  6.8727 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  37.2851     1.8776  19.858  &lt; 2e-16 ***
+## wt           -5.3445     0.5591  -9.559 1.29e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.046 on 30 degrees of freedom
+## Multiple R-squared:  0.7528, Adjusted R-squared:  0.7446 
+## F-statistic: 91.38 on 1 and 30 DF,  p-value: 1.294e-10</code></pre>
+<p>And perform the residual analysis - the aforementioned correlation between weight and transmission type is still visible.</p>
+<p><img src="project_files/figure-html/unnamed-chunk-5-1.png" title="" alt="" width="672" /></p>
+<p>At last, I performed the analysis of model based on weight and transmission type:</p>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + am, data = mtcars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.5295 -2.3619 -0.1317  1.4025  6.8782 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 37.32155    3.05464  12.218 5.84e-13 ***
+## wt          -5.35281    0.78824  -6.791 1.87e-07 ***
+## am          -0.02362    1.54565  -0.015    0.988    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3.098 on 29 degrees of freedom
+## Multiple R-squared:  0.7528, Adjusted R-squared:  0.7358 
+## F-statistic: 44.17 on 2 and 29 DF,  p-value: 1.579e-09</code></pre>
+<p>There significance level for the relation between weight and transmission type is very low (p = 0.988). There is no way to draw a conclusion about the relation from the data. The relation between MPG and transmission type can be solely explained by weight (with high significance level p &lt; 1.87e-07). The drop of MPG per 1 thousand lb is 5.35281 with standard error 0.78824.</p>
+</div>
+<div id="appendix" class="section level2">
+<h2>Appendix</h2>
+<div id="appendix-1---full-model" class="section level3">
+<h3>Appendix 1 - Full Model</h3>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ ., data = mtcars)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.4506 -1.6044 -0.1196  1.2193  4.6271 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept) 12.30337   18.71788   0.657   0.5181  
+## cyl         -0.11144    1.04502  -0.107   0.9161  
+## disp         0.01334    0.01786   0.747   0.4635  
+## hp          -0.02148    0.02177  -0.987   0.3350  
+## drat         0.78711    1.63537   0.481   0.6353  
+## wt          -3.71530    1.89441  -1.961   0.0633 .
+## qsec         0.82104    0.73084   1.123   0.2739  
+## vs           0.31776    2.10451   0.151   0.8814  
+## am           2.52023    2.05665   1.225   0.2340  
+## gear         0.65541    1.49326   0.439   0.6652  
+## carb        -0.19942    0.82875  -0.241   0.8122  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.65 on 21 degrees of freedom
+## Multiple R-squared:  0.869,  Adjusted R-squared:  0.8066 
+## F-statistic: 13.93 on 10 and 21 DF,  p-value: 3.793e-07</code></pre>
+</div>
+</div>
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
